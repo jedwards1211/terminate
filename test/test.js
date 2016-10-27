@@ -23,9 +23,8 @@ test(cyan('Spawn a Parent process which has a few Child Processes'), function (t
       t.true(children.length > 0, green("✓ There are "+children.length+" active child processes"));
     })
     setTimeout(function() {
-      terminate(parent.pid, function(err, done) {
+      terminate(parent.pid, function(err) {
         t.equal(err, null, green("✓ No Errors"))
-        t.equal(done, true, green("✓ Terminator killed all the processes"))
       })
       setTimeout(function() {
         psTree(parent.pid, function (err, children) {
@@ -63,4 +62,12 @@ test(cyan('Terminate a process without providing a callback'), function (t) {
       });
     },1000); // give psTree time to kill the processes
   },200); // give the child process time to spawn
+});
+
+test(cyan('Mock psTree calling back with an err'), function (t) {
+  var error = new Error('test')
+  terminate._psTreeCallback(error, undefined, function (err) {
+    t.equal(error, err);
+    t.end();
+  });
 });
